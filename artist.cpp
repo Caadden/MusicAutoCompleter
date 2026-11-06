@@ -1,4 +1,5 @@
 #include "artist.h"
+#include "song.h"
 
 artist::artist(std::string inputArtistName) {
     artistName = inputArtistName;

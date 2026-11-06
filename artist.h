@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+class song;
+
 class artist {
     std::string artistName;
     std::vector<song*> songList;
