@@ -1,9 +1,12 @@
 #include "song.h"
+//#include "trie.h"
+//#include "HashTable.h"
 #include <vector>
 #include <utility>
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <iostream>
 #include <chrono>
 
 
@@ -110,11 +113,71 @@ int main() {
     auto parsedData = csvParse("..\\spotify-tracks-dataset.csv");
 
 
-    //while loop, send all valid songs to trie and hash
-    //while loop, send all valid artists to trie and hash
+    // trie songTrie();
+    // trie artistTrie();
+    // HashTable songHash();
+    // HashTable artistHash();
+    bool structureType;
+    char menuInput;
+
+    // //loop, send all valid songs to trie and hash
+    // for (song* i : parsedData.first) {
+    //     songTrie.insert(i->getTrackName(), i);
+    //     songHash.insert(i->getTrackName(), i);
+    // }
+    // //loop, send all valid artists to trie and hash
+    // for (artist* i : parsedData.second) {
+    //     artistTrie.insert(i->getArtistName(), i);
+    //     artistHash().insert(i->getArtistName(), i);
+    // }
 
     //Main UI and Selection
     //while true loop, present selections and wait for input
+    std::cout << "**************************************************************************\n";
+    std::cout << "*                                                                        *\n";
+    std::cout << "*                                                                        *\n";
+    std::cout << "*                       Music Search Autocompleter                       *\n";
+    std::cout << "*                                                                        *\n";
+    std::cout << "*                                                                        *\n";
+    std::cout << "**************************************************************************\n\n\n";
+    std::cout << "Welcome to the Music Search Autocompleter, a program that aims to process\n";
+    std::cout << "and serve information regarding the top songs on Spotify! To begin, please\n";
+    std::cout << "select which data structure you'd like to use (this can be changed later).\n\n";
+    std::cout << "             1:Trie                    0:Hash                             \n\n";
+    std::cin >> structureType;
+    std::cout << "\n\n                               Main Menu:\n";
+    std::cout << "                     (Use Number Keys to Navigate)\n\n";
+    std::cout << "1. Search by Song Name (e.g, \"Smooth Criminal\")\n";
+    std::cout << "2. Search by Artist Name (e.g, \"Michael Jackson\")\n";
+    std::cout << "3. Swap Preferred Data Structure (Hash/Trie)\n";
+    std::cout << "4. Time Execution Comparison\n";
+    std::cout << "5. Quit\n\n";
+    while (true) {
+        std::cin >> menuInput;
+        if (menuInput == '1') {
+            std::cout << "WIP_SONG_NAME_SEARCH\n";
+        }
+        else if (menuInput == '2') {
+            std::cout << "WIP_ARTIST_NAME_SEARCH\n";
+        }
+        else if (menuInput == '3') {
+            structureType = !structureType;
+            std::cout << "Data structure switched successfully, you are now using the ";
+            if (structureType) {std::cout << "trie!\n";} else {std::cout << "hash!\n";}
+        }
+        else if (menuInput == '4') {
+            std::cout << "WIP_STRUCTURE_TIME_COMPARISON\n";
+        }
+        else if (menuInput == '5') {
+            std::cout << "Thanks for using the Music Search Autocompleter, have a great day!";
+            return 0;
+        }
+        else {
+            std::cout << "Unrecognized menu selection, please try again.\n";
+        }
+    }
+
+
     //1. Search by Song Name
         //ask if trie search or hash search, or present both searches possibly?
         //perform search on selected type, max 5 prolly
