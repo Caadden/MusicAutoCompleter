@@ -2,20 +2,93 @@
 #include <vector>
 #include <utility>
 #include <fstream>
+#include <sstream>
+#include <unordered_map>
 #include <chrono>
 
-std::pair<std::vector<song*>, std::vector<artist*>> csvParse(std::string& fileName) {
-    //declare vectors
+
+std::pair<std::vector<song*>, std::vector<artist*>> csvParse(const std::string& fileName) {
+    //declare variables n such
+    std::unordered_map<std::string, artist*> artistMap; //unordered map used for looking for dupe artists
+    std::vector<song*> songList;
+    std::vector<artist*> artistList;
     //open file
-    //move to first song
-    //parse song info & add to vector
-    //check if duplicate artist
-        //if no dupe, add to vector and add obj to song with ref to song in artist
-        //if dupe, add existing obj to song with ref to song in artist
-    //repeat until eof
-    //close file
-    //add both vectors to pair
-    //return pair (pair stores by copy, so it should be ok to return!)
+    std::ifstream trackDataset (fileName);
+    if (trackDataset.is_open()) {
+        std::string songData;
+        std::getline(trackDataset, songData); //removes data labels
+        std::vector<std::string> songTokenized; //since all tokens need to be accessed at once, all get held in vector
+        std::string temp; //holds string to be added to vector
+        while (std::getline(trackDataset, songData)) { //loop through each line (song)
+            std::stringstream songStream(songData); //data to stream so it's usable with getline
+            while (songStream.peek() != std::istream::traits_type::eof()) {
+                if (songStream.peek() == '\"') {
+                    int quoteCount = 1;
+                    songStream.ignore();
+                    songTokenized.emplace_back("");
+                    while (std::getline(songStream, temp, '\"')) {
+                        songTokenized.back() += temp;
+                        if (songStream.peek() == ',') {
+                            if (temp.empty() == true || temp.substr(temp.size() - 1, 1) != " ") {
+                                songStream.ignore();
+                                if (songStream.peek() != ' ' && quoteCount % 2 == 1) {
+                                    break;
+                                }
+                                songTokenized.back() += "\",";
+                                quoteCount++;
+                                continue;
+                            }
+                        }
+                        songTokenized.back() += "\"";
+                        quoteCount++;
+                    }
+                }
+                else {
+                    std::getline(songStream, temp, ',');
+                    songTokenized.push_back(temp);
+                }
+            }
+            songList.push_back(new song(songTokenized.at(2), songTokenized.at(4), songTokenized.at(5),
+                                        std::stoul(songTokenized.at(6)), std::stoul(songTokenized.at(7)),
+                                        songTokenized.at(8) == "True", std::stof(songTokenized.at(9)) * 100,
+                                        std::stof(songTokenized.at(10)) * 100, std::stoi(songTokenized.at(11)),
+                                        std::stof(songTokenized.at(12)), std::stoi(songTokenized.at(13)),
+                                        std::stof(songTokenized.at(14)) * 100, std::stof(songTokenized.at(15)) * 100,
+                                        std::stof(songTokenized.at(16)) * 100, std::stof(songTokenized.at(17)) * 100,
+                                        std::stof(songTokenized.at(18)) * 100, std::stoi(songTokenized.at(19)),
+                                        std::stoi(songTokenized.at(20)), songTokenized.at(21)));
+            //verify artist, only the first artist mentioned is used
+            if (songTokenized.at(3).find(';') != std::string::npos) {
+                songTokenized.at(3) = songTokenized.at(3).substr(0,songTokenized.at(3).find(';'));
+            }
+
+            artist* currentArtist = nullptr;
+            auto it = artistMap.find(songTokenized.at(3));
+
+            //checks if artist is already present
+            if (it == artistMap.end()) {
+                currentArtist = new artist(songTokenized.at(3));
+                artistMap[songTokenized.at(3)] = currentArtist;
+                artistList.push_back(currentArtist);
+            }
+            else {
+                currentArtist = it->second;
+            }
+
+            currentArtist->addSong(songList.back());
+            songList.back()->setArtist(currentArtist);
+
+            //std::cout << "song #" << songTokenized.at(0) << " added!\n"; //FOR DEBUG ONLY, COMMENT OUT LATER
+
+            songTokenized.clear();
+        }
+        trackDataset.close();
+    }
+    else {
+        throw std::ios_base::failure("Unable to open \"" + fileName + "\", ensure the file is correctly placed and restart the program.");
+    }
+
+    return std::make_pair(songList, artistList);
 }
 
 int main() {
@@ -34,6 +107,9 @@ int main() {
 
     //Setup
     //send filename to csvParse, get back pair with all valid songs and artists
+    auto parsedData = csvParse("..\\spotify-tracks-dataset.csv");
+
+
     //while loop, send all valid songs to trie and hash
     //while loop, send all valid artists to trie and hash
 
