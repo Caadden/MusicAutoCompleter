@@ -1,6 +1,6 @@
 #include "song.h"
-//#include "trie.h"
-//#include "HashTable.h"
+#include "trie.h"
+#include "HashTable.h"
 #include <vector>
 #include <utility>
 #include <fstream>
@@ -110,26 +110,28 @@ int main() {
 
     //Setup
     //send filename to csvParse, get back pair with all valid songs and artists
+    std::cout << "Starting...\n";
     auto parsedData = csvParse("..\\spotify-tracks-dataset.csv");
 
 
-    // trie songTrie();
-    // trie artistTrie();
-    // HashTable songHash();
-    // HashTable artistHash();
+    Trie<song> songTrie;
+    Trie<artist> artistTrie;
+    HashTable<song> songHash;
+    HashTable<artist> artistHash;
     bool structureType;
     char menuInput;
+    std::string inputHolder;
 
-    // //loop, send all valid songs to trie and hash
-    // for (song* i : parsedData.first) {
-    //     songTrie.insert(i->getTrackName(), i);
-    //     songHash.insert(i->getTrackName(), i);
-    // }
-    // //loop, send all valid artists to trie and hash
-    // for (artist* i : parsedData.second) {
-    //     artistTrie.insert(i->getArtistName(), i);
-    //     artistHash().insert(i->getArtistName(), i);
-    // }
+    //loop, send all valid songs to trie and hash
+    for (song* i : parsedData.first) {
+        songTrie.insert(i->getTrackName(), i);
+        songHash.insert(i->getTrackName(), i);
+    }
+    //loop, send all valid artists to trie and hash
+    for (artist* i : parsedData.second) {
+        artistTrie.insert(i->getArtistName(), i);
+        artistHash.insert(i->getArtistName(), i);
+    }
 
     //Main UI and Selection
     //while true loop, present selections and wait for input
@@ -143,30 +145,125 @@ int main() {
     std::cout << "Welcome to the Music Search Autocompleter, a program that aims to process\n";
     std::cout << "and serve information regarding the top songs on Spotify! To begin, please\n";
     std::cout << "select which data structure you'd like to use (this can be changed later).\n\n";
-    std::cout << "             1:Trie                    0:Hash                             \n\n";
+    std::cout << "             0:Trie                    1:Hash                             \n\n";
     std::cin >> structureType;
-    std::cout << "\n\n                               Main Menu:\n";
+    std::cout << "\n                               Main Menu:\n";
     std::cout << "                     (Use Number Keys to Navigate)\n\n";
     std::cout << "1. Search by Song Name (e.g, \"Smooth Criminal\")\n";
     std::cout << "2. Search by Artist Name (e.g, \"Michael Jackson\")\n";
     std::cout << "3. Swap Preferred Data Structure (Hash/Trie)\n";
     std::cout << "4. Time Execution Comparison\n";
-    std::cout << "5. Quit\n\n";
+    std::cout << "5. Quit\n";
     while (true) {
+        std::cout << "Please select a menu option: ";
         std::cin >> menuInput;
         if (menuInput == '1') {
-            std::cout << "WIP_SONG_NAME_SEARCH\n";
+            std::cout << "Please enter a full or partial song name you wish to search for: ";
+            std::cin.ignore();
+            std::getline(std::cin, inputHolder);
+            std::cout << "\n\n";
+            std::vector<song*> searchResults;
+            if (structureType) {
+                searchResults = songTrie.search(inputHolder, 5);
+            }
+            else {
+                searchResults = songHash.search(inputHolder, 5);
+            }
+            if (searchResults.empty()) {
+                std::cout << "No results found, returning to main menu.\n";
+                continue;
+            }
+            std::cout << "Displaying Results:\n";
+            for (int i = 0; i < searchResults.size(); i++) {
+                std::cout << i + 1 << ". " << searchResults.at(i)->getTrackName() << "\n";
+            }
+            while (true) {
+                std::cout << "Select a valid number to pick a song, or 0 to return to menu\n";
+                std::cin >> menuInput;
+                if ((menuInput - '0') <= searchResults.size() && (menuInput - '0') > 0) {
+                    std::cout << "Song Name: " << searchResults.at(menuInput - '1')->getTrackName() << "\t\tSong Artist: " << searchResults.at(menuInput - '1')->getArtist()->getArtistName() << "\n";
+                    std::cout << "Album: " << searchResults.at(menuInput - '1')->getAlbum() << "\t\tPopularity (from 0 to 100): " << searchResults.at(menuInput - '1')->getPopularity() << "\n";
+                    std::cout << "Duration: " << searchResults.at(menuInput - '1')->getDuration() / 60000 << " min " << searchResults.at(menuInput - '1')->getDuration() % 60000 / 1000 << " sec";
+                    std::cout << "\t\tExplicit: ";
+                    if (searchResults.at(menuInput - '1')->getExplicit()) {std::cout << "True\n";} else {std::cout << "False\n";}
+                    std::cout << "Energy (from 0 to 100): " << searchResults.at(menuInput - '1')->getEnergy() << "\t\tMusical Key: " << searchResults.at(menuInput - '1')->getKey() << "\n";
+                    std::cout << "Valence (from 0 to 100): " << searchResults.at(menuInput - '1')->getValence() << "\t\tTempo: " << searchResults.at(menuInput - '1')->getTempo() << "\n\n";
+                }
+                else {
+                    break;
+                }
+            }
         }
         else if (menuInput == '2') {
-            std::cout << "WIP_ARTIST_NAME_SEARCH\n";
+            std::cout << "Please enter a full or partial artist name you wish to search for: ";
+            std::cin.ignore();
+            std::getline(std::cin, inputHolder);
+            std::cout << "\n\n";
+            std::vector<artist*> searchResults;
+            if (structureType) {
+                searchResults = artistTrie.search(inputHolder, 5);
+            }
+            else {
+                searchResults = artistHash.search(inputHolder, 5);
+            }
+            if (searchResults.empty()) {
+                std::cout << "No results found, returning to main menu.\n";
+                continue;
+            }
+            std::cout << "Displaying Results:\n";
+            for (int i = 0; i < searchResults.size(); i++) {
+                std::cout << i + 1 << ". " << searchResults.at(i)->getArtistName() << "\n";
+            }
+            while (true) {
+                std::cout << "Select a valid number to pick an artist, or 0 to return to menu\n";
+                std::cin >> menuInput;
+                if ((menuInput - '0') <= searchResults.size() && (menuInput - '0') > 0) {
+                    std::cout << "\nArtist Name: " << searchResults.at(menuInput - '1')->getArtistName();
+                    std::cout << "Song List: \n";
+                    for (song* i : searchResults.at(menuInput - '1')->getSongList()) {
+                        std::cout << i->getTrackName() << "\n";
+                    }
+                    std::cout << "\n";
+                }
+                else {
+                    break;
+                }
+            }
         }
         else if (menuInput == '3') {
             structureType = !structureType;
             std::cout << "Data structure switched successfully, you are now using the ";
-            if (structureType) {std::cout << "trie!\n";} else {std::cout << "hash!\n";}
+            if (structureType) {std::cout << "hash!\n";} else {std::cout << "trie!\n";}
         }
         else if (menuInput == '4') {
-            std::cout << "WIP_STRUCTURE_TIME_COMPARISON\n";
+            std::cout << "Please enter a full or partial song name you wish to use for the time comparison: ";
+            std::cin.ignore();
+            std::getline(std::cin, inputHolder);
+            std::cout << "\n\nStarting...\n";
+
+            auto trieStart = std::chrono::high_resolution_clock::now();
+            songTrie.search(inputHolder, 1);
+            auto trieStop = std::chrono::high_resolution_clock::now();
+            auto trieMicroseconds = std::chrono::duration_cast<std::chrono::microseconds>(trieStop - trieStart);
+
+            auto hashStart = std::chrono::high_resolution_clock::now();
+            songHash.search(inputHolder, 1);
+            auto hashStop = std::chrono::high_resolution_clock::now();
+            auto hashMicroseconds = std::chrono::duration_cast<std::chrono::microseconds>(hashStop - hashStart);
+
+            std::cout << "Finished!\n";
+            std::cout << "Trie search completion time: " << trieMicroseconds.count() << " microseconds\t\tHash search completion time: " << hashMicroseconds.count() << " microseconds\n";
+            std::cout << "Delta: " << std::abs(trieMicroseconds.count() - hashMicroseconds.count()) << " microseconds\n";
+            std::cout << "Faster structure: ";
+            if (trieMicroseconds.count() > hashMicroseconds.count()) {
+                std::cout << "Hash\n\n";
+            }
+            else if (trieMicroseconds.count() > hashMicroseconds.count()) {
+                std::cout << "Trie\n\n";
+            }
+            else {
+                std::cout << "Equal\n\n";
+            }
         }
         else if (menuInput == '5') {
             std::cout << "Thanks for using the Music Search Autocompleter, have a great day!";
@@ -176,28 +273,4 @@ int main() {
             std::cout << "Unrecognized menu selection, please try again.\n";
         }
     }
-
-
-    //1. Search by Song Name
-        //ask if trie search or hash search, or present both searches possibly?
-        //perform search on selected type, max 5 prolly
-        //Select 1-5 to pick a song, or 0 to return to menu
-            //when song selected, display info about song (danceability, popularity, explicit, etc)
-            //this menu should allow for picking another song from previous menu
-    //2. Search by Artist Name
-        //ask if trie search or hash search, or present both searches possibly?
-        //perform search on selected type, max 5 prolly
-        //Select 1-5 to pick an artist, or 0 to return to menu
-            //when artist selected, display artist song list and allow user to pick a song to learn more (1-5)
-                //when song selected, display info about song (danceability, popularity, explicit, etc)
-                //this menu should allow for picking another song from previous menu
-            //this menu should allow for picking another artist from previous menu
-    //3. Time Execution Comparison
-        //ask user if wishes to compare with artist or song data types
-        //ask user for query to search for
-        //start timer for hash and search. After found, stop timer
-        //start timer for trie and search. After found, stop timer
-        //Display time taken for both methods, differential between the two, and mark the faster data structure
-    //4. Quit
-        //break while loop
 }
