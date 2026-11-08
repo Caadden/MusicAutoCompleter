@@ -1,6 +1,3 @@
-#include "song.h"
-#include "trie.h"
-#include "HashTable.h"
 #include <vector>
 #include <utility>
 #include <fstream>
@@ -8,6 +5,10 @@
 #include <unordered_map>
 #include <iostream>
 #include <chrono>
+
+#include "song.h"
+#include "trie.h"
+#include "HashTable.h"
 
 
 std::pair<std::vector<song*>, std::vector<artist*>> csvParse(const std::string& fileName) {
@@ -95,19 +96,6 @@ std::pair<std::vector<song*>, std::vector<artist*>> csvParse(const std::string& 
 }
 
 int main() {
-    /*
-     *TODO:
-     * - Parse inputs, then add results to tries & hashes
-     * - Initial selection menu
-     * - Song name search (with select between hash and trie search methods)
-     * - Artist name search (with select between hash and trie search methods)
-     * - More details when selecting a song/artist after search
-     * - Time execution comparison
-     */
-
-    //Layout
-
-
     //Setup
     //send filename to csvParse, get back pair with all valid songs and artists
     std::cout << "Starting...\n";
@@ -219,7 +207,7 @@ int main() {
                 std::cin >> menuInput;
                 if ((menuInput - '0') <= searchResults.size() && (menuInput - '0') > 0) {
                     std::cout << "\nArtist Name: " << searchResults.at(menuInput - '1')->getArtistName();
-                    std::cout << "Song List: \n";
+                    std::cout << "\nSong List: \n";
                     for (song* i : searchResults.at(menuInput - '1')->getSongList()) {
                         std::cout << i->getTrackName() << "\n";
                     }
