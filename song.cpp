@@ -64,16 +64,16 @@ float song::getEnergy() {
 
 std::string song::getKey() {
     if (key == 0) {return "C";}
-    if (key == 1) {return "C#/D♭";}
+    if (key == 1) {return "C#";}
     if (key == 2) {return "D";}
-    if (key == 3) {return "D#/E♭";}
+    if (key == 3) {return "D#";}
     if (key == 4) {return "E";}
     if (key == 5) {return "F";}
-    if (key == 6) {return "F#/G♭";}
+    if (key == 6) {return "F#";}
     if (key == 7) {return "G";}
-    if (key == 8) {return "G#/A♭";}
+    if (key == 8) {return "G#";}
     if (key == 9) {return "A";}
-    if (key == 10) {return "A#/B♭";}
+    if (key == 10) {return "A#";}
     if (key == 11) {return "B";}
     return "Unknown";
 }
