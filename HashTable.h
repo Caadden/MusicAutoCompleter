@@ -15,11 +15,13 @@ public:
     void insert(const std::string& key, T* value) {
         std::string lowerKey = toLower(key);
 
-        for (int i = 1; i < lowerKey.size(); i++) {
+        // insert all prefixes of the key
+        for (int i = 1; i <= lowerKey.size(); i++) {
             std::string prefix = lowerKey.substr(0, i);
             int idx = hashString(prefix);
-
             bool found = false;
+
+            // check if the prefix already exists in the table
             for (int j = 0; j < table[idx].size(); j++) {
                 if (table[idx][j].prefix == prefix) {
                     table[idx][j].results.push_back(value);
@@ -28,6 +30,7 @@ public:
                 }
             }
 
+            // prefix hasn't been seen before, make a new node
             if (found == false) {
                 Node newNode;
 
@@ -37,6 +40,7 @@ public:
 
                 count++;
 
+                // resize if the number of unique prefixes exceeds the table size
                 if (count > table.size()) {
                     resize();
                 }
@@ -51,7 +55,24 @@ public:
             return results;
         }
 
-        // WIP
+        std::string lowerPrefix = toLower(prefix);
+        int idx = hashString(lowerPrefix);
+
+        for (int i = 0; i < table[idx].size(); i++) {
+            if (table[idx][i].prefix == lowerPrefix) {
+                for (int j = 0; j < table[idx][i].results.size(); j++) {
+
+                    // break loop if we've reached the limit
+                    if (j >= limit) {
+                        break;
+                    }
+                    results.push_back(table[idx][i].results[j]);
+                }
+                break; // prefix is found
+            }
+        }
+
+        return results;
     }
     
     std::vector<T*> search(const std::string& prefix) const {
