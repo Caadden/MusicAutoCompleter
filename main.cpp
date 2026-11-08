@@ -219,7 +219,7 @@ int main() {
                 std::cin >> menuInput;
                 if ((menuInput - '0') <= searchResults.size() && (menuInput - '0') > 0) {
                     std::cout << "\nArtist Name: " << searchResults.at(menuInput - '1')->getArtistName();
-                    std::cout << "Song List: \n";
+                    std::cout << "\nSong List: \n";
                     for (song* i : searchResults.at(menuInput - '1')->getSongList()) {
                         std::cout << i->getTrackName() << "\n";
                     }
