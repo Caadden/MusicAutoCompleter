@@ -13,8 +13,7 @@
 #include <iostream>
 
 // ------------ Information about trie.h ------------
-// the only thing ever recieved from Song Loader is a vector of songs --> vector<SearchEntry> songs;
-/* there are two entries:
+/* Entries:
     - Key: song title OR artist name (user types the prefix)
     - Value: song* artist* themselves. Main builds the "Song - Artist" display for the text and utilizes pointers for more info part of the menu
     - Case-insensitive matching. Results will alphabetically come back for their key order.
