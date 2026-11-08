@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cctype>
+#include <climits>
 
 template <typename T>
 class HashTable {
@@ -12,15 +13,49 @@ public:
     }
 
     void insert(const std::string& key, T* value) {
-        // WIP
+        std::string lowerKey = toLower(key);
+
+        for (int i = 1; i < lowerKey.size(); i++) {
+            std::string prefix = lowerKey.substr(0, i);
+            int idx = hashString(prefix);
+
+            bool found = false;
+            for (int j = 0; j < table[idx].size(); j++) {
+                if (table[idx][j].prefix == prefix) {
+                    table[idx][j].results.push_back(value);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found == false) {
+                Node newNode;
+
+                newNode.prefix = prefix;
+                newNode.results.push_back(value);
+                table[idx].push_back(newNode);
+
+                count++;
+
+                if (count > table.size()) {
+                    resize();
+                }
+            }
+        }
     }
 
     std::vector<T*> search(const std::string& prefix, int limit) const {
+        std::vector<T*> results;
+
+        if (prefix.empty() || limit <= 0) {
+            return results;
+        }
+
         // WIP
     }
     
     std::vector<T*> search(const std::string& prefix) const {
-        // WIP
+        return search(prefix, INT_MAX);
     }
 
 private:
